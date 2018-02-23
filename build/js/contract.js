@@ -29,8 +29,41 @@ function main() {
       if(err) throw err;
       contract.balanceOf(defaultAccount, function(err, balance){
         if(err) throw err;
-        PuddingCoin(defaultAccount, contract, name, symbol, balance);
+        initializeApp(defaultAccount, contract, name, symbol, balance);
       });
     });
   });
+}
+
+function initializeApp(defaultAccount, contract, name, symbol, balance) {
+  new Vue({
+    el: '#js-app',
+    data: {
+      defaultAccount: defaultAccount, // 選択されているEhtereumアカウント
+      name: name,                     // トークンの名前
+      symbol: symbol,                 // トークンのシンボル
+      balance: balance,               // トークンをいくら所持しているか
+      to: "",                         // 送金先アドレス
+      amount: 0,                      // 送金する量
+      history: ""                     // 送金トランザクションのハッシュ
+    },
+    methods: {
+      // 残高の表示を整形するメソッド
+      showBalance: function(balance) {
+        return (balance / 1e18).toFixed(2);
+      },
+      // 送金するメソッド
+      send: function() {
+        var $this = this;
+        var sendAmount = this.amount * 1e18;
+        contract.transfer(this.to, sendAmount, {from: defaultAccount}, function(err, txhash){
+          if (err) throw err;
+          $this.history = txhash;
+          contract.balanceOf(defaultAccount, function(err, balance){
+            $this.balance = balance;
+          });
+        });
+      }
+    }
+  })
 }
