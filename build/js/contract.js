@@ -29,7 +29,7 @@ function main() {
       if(err) throw err;
       contract.balanceOf(defaultAccount, function(err, balance){
         if(err) throw err;
-        initializeApp(defaultAccount, contract, name, symbol, balance);
+        PuddingCoin(defaultAccount, contract, name, symbol, balance);
       });
     });
   });
